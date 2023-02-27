@@ -6,7 +6,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
+
+import java.util.Map;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -22,6 +25,9 @@ class CreditCardRepositoryTest {
     @Autowired
     EncryptionService encryptionService;
 
+    @Autowired
+    JdbcTemplate jdbcTemplate;
+
     @Test
     void testSaveAndStoreCreditCard() {
         CreditCard creditCard = new CreditCard();
@@ -36,6 +42,13 @@ class CreditCardRepositoryTest {
         System.out.println("CC At Rest");
         System.out.println("CC Encrypted: " + encryptionService.encrypt(CREDIT_CARD));
 
+        Map<String, Object> dbRow = jdbcTemplate.queryForMap("SELECT * FROM credit_card " +
+                "WHERE id = " + savedCC.getId());
+
+        String dbCardValue = (String) dbRow.get("credit_card_number");
+
+        assertThat(savedCC.getCreditCardNumber()).isNotEqualTo(dbCardValue);
+        assertThat(dbCardValue).isEqualTo(encryptionService.encrypt(CREDIT_CARD));
 
         CreditCard fetchedCC = creditCardRepository.findById(savedCC.getId()).get();
 

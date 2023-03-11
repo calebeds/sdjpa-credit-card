@@ -54,4 +54,14 @@ public class CreditCard {
     public void setExpirationDate(String expirationDate) {
         this.expirationDate = expirationDate;
     }
+
+    @Override
+    public String toString() {
+        return "CreditCard{" +
+                "id=" + id +
+                ", creditCardNumber='" + creditCardNumber + '\'' +
+                ", cvv='" + cvv + '\'' +
+                ", expirationDate='" + expirationDate + '\'' +
+                '}';
+    }
 }
